@@ -11,6 +11,7 @@ class TerranBot(sc2.BotAI):
 		await self.build_workers()
 		await self.build_supply_depots()
 		await self.build_refinery()
+		await self.expand()
 
 	async def build_workers(self):
 		for commandcenter in self.units(COMMANDCENTER).ready.noqueue:
@@ -35,6 +36,10 @@ class TerranBot(sc2.BotAI):
 					break
 				if not self.units(REFINERY).closer_than(1.0, geyser).exists:
 					await self.do(worker.build(REFINERY, geyser))
+
+	async def expand(self):
+		if self.units(COMMANDCENTER).amount < 3 and self.can_afford(COMMANDCENTER):
+			await self.expand_now()
 
 
 
