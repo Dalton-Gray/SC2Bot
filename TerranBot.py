@@ -1,7 +1,7 @@
 import sc2
 from sc2 import run_game, maps, Race, Difficulty
 from sc2.player import Bot, Computer
-from sc2.constants import COMMANDCENTER, SCV, SUPPLYDEPOT
+from sc2.constants import COMMANDCENTER, SCV, SUPPLYDEPOT, REFINERY
 
 
 
@@ -10,6 +10,7 @@ class TerranBot(sc2.BotAI):
 		await self.distribute_workers()
 		await self.build_workers()
 		await self.build_supply_depots()
+		await self.build_refinery()
 
 	async def build_workers(self):
 		for commandcenter in self.units(COMMANDCENTER).ready.noqueue:
@@ -21,7 +22,20 @@ class TerranBot(sc2.BotAI):
 			commandcenters = self.units(COMMANDCENTER).ready
 			if commandcenters.exists:
 				if self.can_afford(SUPPLYDEPOT):
-					await self.build(SUPPLYDEPOT, near=commandcenters.first)			
+					await self.build(SUPPLYDEPOT, near=commandcenters.first)
+
+	async def build_refinery(self):
+		for commandcenter in self.units(COMMANDCENTER).ready:
+			geysers = self.state.vespene_geyser.closer_than(15.0, commandcenter)
+			for geyser in geysers:
+				if not self.can_afford(REFINERY):
+					break
+				worker = self.select_build_worker(geyser.position)
+				if worker is None:
+					break
+				if not self.units(REFINERY).closer_than(1.0, geyser).exists:
+					await self.do(worker.build(REFINERY, geyser))
+
 
 
 
