@@ -1,7 +1,7 @@
 import sc2
 from sc2 import run_game, maps, Race, Difficulty
 from sc2.player import Bot, Computer
-from sc2.constants import COMMANDCENTER, SCV, SUPPLYDEPOT, REFINERY, BARRACKS
+from sc2.constants import COMMANDCENTER, SCV, SUPPLYDEPOT, REFINERY, BARRACKS, MARINE
 
 
 
@@ -13,6 +13,7 @@ class TerranBot(sc2.BotAI):
 		await self.build_refinery()
 		await self.expand()
 		await self.build_barracks()
+		await self.train_marines()
 
 	async def build_workers(self):
 		for commandcenter in self.units(COMMANDCENTER).ready.noqueue:
@@ -48,8 +49,10 @@ class TerranBot(sc2.BotAI):
 			if self.can_afford(BARRACKS) and not self.already_pending(BARRACKS):
 				await self.build(BARRACKS, near=supplydepot)
 
-
-
+	async def train_marines(self):
+		for barracks in self.units(BARRACKS).ready.noqueue:
+			if self.can_afford(MARINE) and self.supply_left > 0:
+				await self.do(barracks.train(MARINE))
 
 
 
