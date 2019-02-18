@@ -11,7 +11,7 @@ class TerranBot(sc2.BotAI):
 		await self.distribute_workers()
 		await self.build_workers()
 		await self.build_supply_depots()
-		await self.build_refinery()
+		#await self.build_refinery()
 		await self.expand()
 		await self.build_barracks()
 		await self.train_marines()
@@ -42,7 +42,7 @@ class TerranBot(sc2.BotAI):
 					await self.do(worker.build(REFINERY, geyser))
 
 	async def expand(self):
-		if self.units(COMMANDCENTER).amount < 3 and self.can_afford(COMMANDCENTER):
+		if self.units(COMMANDCENTER).amount < 4 and self.can_afford(COMMANDCENTER):
 			await self.expand_now()
 
 	async def build_barracks(self):
@@ -66,7 +66,7 @@ class TerranBot(sc2.BotAI):
 
 
 	async def attack(self):
-		if self.units(MARINE).amount > 10:
+		if self.units(MARINE).amount > 60:
 			for marine in self.units(MARINE).idle:
 				await self.do(marine.attack(self.find_target(self.state)))
 
@@ -82,5 +82,5 @@ class TerranBot(sc2.BotAI):
 
 run_game(maps.get("AbyssalReefLE"), [
 	Bot(Race.Terran, TerranBot()),
-	Computer(Race.Terran, Difficulty.Easy)
+	Computer(Race.Terran, Difficulty.Hard)
 	], realtime=False)
