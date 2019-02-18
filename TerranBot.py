@@ -2,6 +2,7 @@ import sc2
 from sc2 import run_game, maps, Race, Difficulty
 from sc2.player import Bot, Computer
 from sc2.constants import COMMANDCENTER, SCV, SUPPLYDEPOT, REFINERY, BARRACKS, MARINE
+import random
 
 
 
@@ -14,6 +15,7 @@ class TerranBot(sc2.BotAI):
 		await self.expand()
 		await self.build_barracks()
 		await self.train_marines()
+		await self.attack()
 
 	async def build_workers(self):
 		for commandcenter in self.units(COMMANDCENTER).ready.noqueue:
@@ -53,6 +55,26 @@ class TerranBot(sc2.BotAI):
 		for barracks in self.units(BARRACKS).ready.noqueue:
 			if self.can_afford(MARINE) and self.supply_left > 0:
 				await self.do(barracks.train(MARINE))
+
+	def find_target(self, state):
+		if len(self.known_enemy_units) > 0:
+			return random.choice(self.known_enemy_units)
+		elif len(self.known_enemy_structures) > 0:
+			return random.choice(self.known_enemy_structures)
+		else:
+			return self.enemy_start_locations[0]
+
+
+	async def attack(self):
+		if self.units(MARINE).amount > 10:
+			for marine in self.units(MARINE).idle:
+				await self.do(marine.attack(self.find_target(self.state)))
+
+		elif self.units(MARINE). amount > 3:
+			if len(self.known_enemy_units) >0:
+				for marine in self.units(MARINE).idle:
+					await self.do(marine.attack(random.choice(self.known_enemy_units)))			
+
 
 
 
