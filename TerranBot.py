@@ -1,7 +1,7 @@
 import sc2
 from sc2 import run_game, maps, Race, Difficulty
 from sc2.player import Bot, Computer
-from sc2.constants import COMMANDCENTER, SCV, SUPPLYDEPOT, REFINERY, BARRACKS, MARINE
+from sc2.constants import COMMANDCENTER, SCV, SUPPLYDEPOT, REFINERY, BARRACKS, MARINE, FACTORY, SIEGETANK
 import random
 
 
@@ -11,9 +11,10 @@ class TerranBot(sc2.BotAI):
 		await self.distribute_workers()
 		await self.build_workers()
 		await self.build_supply_depots()
-		#await self.build_refinery()
+		await self.build_refinery()
 		await self.expand()
 		await self.build_barracks()
+		await self.build_factory()
 		await self.train_marines()
 		await self.attack()
 
@@ -50,6 +51,12 @@ class TerranBot(sc2.BotAI):
 			supplydepot = self.units(SUPPLYDEPOT).ready.random
 			if self.can_afford(BARRACKS) and not self.already_pending(BARRACKS):
 				await self.build(BARRACKS, near=supplydepot)
+
+	async def build_factory(self):
+		if self.units(BARRACKS).ready.exists:
+			barracks = self.units(BARRACKS).ready.random
+			if self.can_afford(FACTORY) and not self.already_pending(FACTORY):
+				await self.build(FACTORY, near=barracks)
 
 	async def train_marines(self):
 		for barracks in self.units(BARRACKS).ready.noqueue:
